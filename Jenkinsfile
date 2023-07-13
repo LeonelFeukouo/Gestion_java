@@ -48,11 +48,10 @@ pipeline {
         stage('DEPLOYMENT: Lancement du conteneur') {
             steps {
                 script {
-                    def containerId = sh(returnStdout: true, script: "docker ps -q -f name=app").trim()
+                    def containerId = sh(returnStdout: true, script: "docker ps -a -q -f name=app").trim()
                     if (containerId) {
                         echo "Ancien conteneur détecté : $containerId"
-                        sh "docker kill $containerId"
-                        sh "docker rm $containerId"
+                        sh "docker rm -f $containerId"
                         sh 'docker run -d --name app -p 8081:8080 ${IMAGE}'
                     } else {
                         echo "Aucun ancien conteneur trouvé"
