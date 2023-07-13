@@ -11,11 +11,11 @@ pipeline {
   }
   
     stages {
-        stage('CLONE avec Git') {
-            steps {
-                git branch:'main', url:'https://github.com/LeonelFeukouo/Gestion_java.git'
-            }
-        }
+        //stage('CLONE avec Git') {
+        //    steps {
+        //        git branch:'main', url:'https://github.com/LeonelFeukouo/Gestion_java.git'
+        //    }
+        //}
 
         stage('BUILD avec Maven') {
             steps {
