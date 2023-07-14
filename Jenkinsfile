@@ -25,7 +25,7 @@ pipeline {
         
         stage('TEST avec Sonarqube') {
           steps {
-            withSonarQubeEnv(installationName: 'sq1') { 
+            withSonarQubeEnv('sq1') { 
               sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
             }
           }
