@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent {label 'talys'}
     
     environment{
         IMAGE="leonelfeukouo/talys_app:v_${env.BUILD_NUMBER}"
@@ -50,12 +50,12 @@ pipeline {
                 script {
                     def containerId = sh(returnStdout: true, script: "docker ps -a -q -f name=app").trim()
                     if (containerId) {
-                        echo "Ancien conteneur détecté : $containerId"
-                        sh "docker rm -f $containerId"
-                        sh 'docker run -d --name app -p 8081:8080 ${IMAGE}'
+                        echo "Ancien conteneur détecté, app = $containerId"
+                        sh "docker rm -f app"
+                        sh 'docker run -d --name app -p 8080:8080 ${IMAGE}'
                     } else {
                         echo "Aucun ancien conteneur trouvé"
-                        sh 'docker run -d --name app -p 8081:8080 ${IMAGE}'
+                        sh 'docker run -d --name app -p 8080:8080 ${IMAGE}'
                     }
                 }
                 
