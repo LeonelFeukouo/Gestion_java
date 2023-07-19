@@ -152,9 +152,75 @@ En résumé, l'étape d'installation de Jenkins a été réalisée avec succès.
 
 ## **3. CONFIGURATION DU REFERENTIEL DE CODE SOURCE**
 
+L'étape de configuration du référentiel de code source est essentielle pour intégrer le flux de travail de développement dans notre processus d'intégration continue. Cette section met en évidence les activités réalisées et les décisions prises lors de cette étape.
+
+Avant de configurer Jenkins pour se connecter à notre référentiel GitHub, nous avons créé le référentiel sur GitHub en utilisant l'interface web GitHub.
+
+### **a. Création du référentiel GitHub**
+
+Nous avons créé un nouveau référentiel (ou repertoire) sur [GitHub](https://github.com) en spécifiant les détails tels que le nom du référentiel, la description et les options de visibilité. Par exemple, nous avons utilisé l'interface web GitHub pour créer un nouveau référentiel avec les paramètres suivants :
+
+- Nom du référentiel : **Gestion_java**
+- Description : **A Java Project For Talys InternShip in DevOps**
+- Visibilité : **public**
+
+Vous pouvez trouver le referentiel [ici](https://github.com/LeonelFeukouo/Gestion_java).
+
+### **b. Ajout du référentiel GitHub a Jenkins**
+
+Après avoir créé le référentiel sur GitHub, nous avons configuré Jenkins pour se connecter à notre référentiel en utilisant les étapes de pipeline appropriées.
+Cela permet à Jenkins de récupérer le code source lors des opérations de build et de déploiement.
+
+Par exemple :
+
+    pipeline {
+        agent any
+        stages {
+            stage('Clone') {
+                steps {
+                    git branch:'main', url:'https://github.com/LeonelFeukouo/Gestion_java.git'
+                }
+            }
+        }
+    }
+
+### **c. Vérification de l'accès au référentiel**
+
+Une fois que nous avons configuré le référentiel GitHub dans Jenkins, nous avons vérifié que Jenkins peut accéder avec succès au référentiel GitHub en déclenchant un job de test de récupération du code. Cela permet de s'assurer que Jenkins peut récupérer le code source depuis GitHub sans problème.
+
+Execution du test d'acces au referentiel :
+![Image: "Clone du Repository"](./images/test_clone.png)
+
+En effectuant ces étapes, nous avons réussi à configurer avec succès le référentiel GitHub dans Jenkins, à vérifier l'accès au référentiel pour garantir la recuperation en tout temps du code source et le bon fonctionnement de notre processus d'intégration continue.
+
 &nbsp;
 
 ## **4. CONFIGURATION DU PROJET JENKINS**
+
+L'étape de configuration du projet Jenkins est cruciale pour définir l'environnement d'intégration continue pour notre application. Cette section met en évidence les activités réalisées et les décisions prises lors de cette étape.
+
+### **a. Création d'un nouveau projet Jenkins pour l'application**
+
+Nous avons créé un nouveau projet Jenkins dédié à notre application. Pour cela, nous avons utilisé l'interface Jenkins pour créer un nouveau projet de type Pipeline, selon les besoins de notre projet, et nous l'avons nommé **Projet_De_Stage_Talys**
+![Image: "Creation Projet"](./images/creation_projet.png)
+
+### **b. Configuration des paramètres généraux du projet**
+
+- **Description du projet :** Nous avons ajouté une description pour décrire brièvement le projet et son objectif.
+![Image: "Description du Projet"](./images/description_projet.png)
+
+- **Paramètres du projet :** Ce projet contient des paramètres, mais nous les inclurons directement dans les script pipeline, pour permetre une reutilisation de ce script dans d'autres projet à l'avenir.
+
+- **Déclencheurs du projet :** Comme declencheur, nous avons specifié que notre projet se déclenchera apres chaque modification de code source sur le repository GitHub. Pour cela, nous avons configuré un webhook sur GitHub, pour informer Jenkins après chaque modification.
+![Image: "GitHub WebHook"](./images/github_webhook.png)
+Et nous l'avons activé dans Jenkins comme suit:
+![Image: "Build Triggers"](./images/build_triggers.png)
+
+- **Definition du Projet :**
+![Image: "Definition du projet"](./images/definition_projet1.png)
+![Image: "Definition du projet"](./images/definition_projet2.png)
+
+En effectuant ces étapes, nous avons réussi à configurer avec succès le projet Jenkins pour notre application, en veillant à ce qu'il soit bien adapté à notre processus d'intégration continue et aux besoins spécifiques de notre projet.
 
 &nbsp;
 
