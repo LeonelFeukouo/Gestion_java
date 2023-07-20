@@ -51,7 +51,7 @@ pipeline {
             }
         }
     
-        stage('RELEASE avec Dockerfile') {
+        stage('Creation de l\'image docker') {
             steps {
                 sh 'docker build -t ${IMAGE} .'
             }
@@ -65,7 +65,7 @@ pipeline {
             }
         }
         
-        stage('DEPLOYMENT: Lancement du conteneur') {
+        stage('Lancement du conteneur') {
             steps {
                 script {
                     def containerId = sh(returnStdout: true, script: "docker ps -a -q -f name=app").trim()
