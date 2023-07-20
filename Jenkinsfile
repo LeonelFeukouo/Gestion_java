@@ -30,6 +30,26 @@ pipeline {
             }
           }
         }
+
+        stage('Deploy to Nexus') {
+            steps {
+                nexusArtifactUploader artifacts: [
+                    [
+                        artifactId: 'Gestion', 
+                        classifier: '', 
+                        file: './target/Gestion.war', 
+                        type: 'war'
+                    ]
+                ], 
+                credentialsId: 'nexus_connexion', 
+                groupId: 'com.WA', 
+                nexusUrl: '51.91.204.154:8082', 
+                nexusVersion: 'nexus3', 
+                protocol: 'http', 
+                repository: 'Gestion_java', 
+                version: '1.0.4-SNAPSHOT'
+            }
+        }
     
         stage('RELEASE avec Dockerfile') {
             steps {

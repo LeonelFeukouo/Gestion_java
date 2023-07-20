@@ -93,7 +93,26 @@ Avant d'installer Jenkins, nous avons vérifié les prérequis système pour nou
 
 #### Exigences logicielles
 
-- Java
+- **Java :**
+
+        sudo apt-get install -y openjdk-11-jdk
+
+- **Docker :**
+
+        sudo apt-get install -y ca-certificates curl gnupg
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/debian/gpg |     sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
+        echo \
+            "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+            "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+Veillez a ajouter votre utilisateur au groupe docker:
+
+        sudo usermod -aG docker NOM_DE_VOTRE_USER
 
 ### **b. Téléchargement et installation de Jenkins dans docker**
 
@@ -137,6 +156,17 @@ Ensuite, créer un credential, pour permettre la communication entre Jenkins et 
 Une fois le credential créé, nous devons configurer SonarQube dans Jenkins comme suit :
 ![Image: "Configuration SonarQube"](./images/installation_sonarqube.png)
 
+#### Configuration de Nexus dans Jenkins
+
+Tout d’abord, nous devons installer le plugin nécessaire (Nexus Artifact Uploader) comme suit :
+![Image: "Plugin Nexus"](./images/plugin_nexus.png)
+
+Ensuite, créer un credential, pour permettre la communication entre Jenkins et le conteneur Nexus à l’adresse <http://51.91.204.154:8082/> :
+![Image: "Credential nexus"](./images/credential_nexus.png)
+
+Une fois le credential créé, nous devons configurer Nexus dans Jenkins comme suit :
+![Image: "Configuration Nexus"](./images/installation_nexus.png)
+
 #### Configuration de Docker Hub
 
 Nous avons aussi besoin de créer un credential, pour permettre à Jenkins de se connecter à notre repository Docker Hub, pour sauvegarder les images créer par les builds.
@@ -144,7 +174,7 @@ Nous avons aussi besoin de créer un credential, pour permettre à Jenkins de se
 
 ### **f. Intégration avec les outils externes**
 
-Nous avons réalisé l'intégration de Jenkins avec d'autres outils utilisés dans notre pile DevOps. Cela comprend les outils de gestion des tests, les systèmes de gestion des versions et les outils de surveillance, parmi d'autres. L'intégration avec ces outils permet une automatisation plus complète et une meilleure visibilité des différentes phases du cycle de vie du développement. C’est le cas de SonarQube comme vu précédemment.
+Nous avons réalisé l'intégration de Jenkins avec d'autres outils utilisés dans notre pile DevOps. Cela comprend les outils de gestion des tests, les systèmes de gestion des versions et les outils de surveillance, parmi d'autres. L'intégration avec ces outils permet une automatisation plus complète et une meilleure visibilité des différentes phases du cycle de vie du développement. C’est le cas de SonarQube et de Nexus comme vu précédemment.
 
 En résumé, l'étape d'installation de Jenkins a été réalisée avec succès. Jenkins est désormais prêt à être utilisé pour les prochaines étapes de notre projet DevOps.
 
