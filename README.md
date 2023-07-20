@@ -40,6 +40,10 @@ Après avoir examiné différentes options, les outils suivants ont été choisi
 
     Pour l'analyse statique du code et l'assurance de la qualité.
 
+- **Nexus :**
+
+    Pour le deploiement des artefacts de build.
+
 - **Docker :**
 
     Pour la création d'environnements de développement et de déploiement isolés.
