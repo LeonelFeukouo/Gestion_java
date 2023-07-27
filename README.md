@@ -260,17 +260,120 @@ En effectuant ces étapes, nous avons réussi à configurer avec succès le proj
 
 ## **5. CREATION DU PIPELINE JENKINS**
 
+L'étape de création du pipeline Jenkins est essentielle pour définir un processus d'intégration et de déploiement continu (CI/CD) pour notre application. Cette section met en évidence les activités réalisées et les décisions prises lors de cette étape.
+
+### **a. Élaboration du pipeline CI/CD en utilisant le langage de script Jenkins**
+
+Nous avons créé un pipeline Jenkins en utilisant le langage de script Jenkins (Pipeline DSL) pour définir notre processus CI/CD. Le pipeline décrit les étapes et les actions à effectuer, depuis la récupération du code source jusqu'au déploiement de l'application.
+
+Le pipeline suivant utilise le langage de script Jenkins, et defini quelques grandes etapes qui sont utilisées dans notre pipeline :
+
+    pipeline {
+        agent any
+        
+        stages {
+            stage('Checkout') {
+                steps {
+                    echo "Récupération du code source depuis le référentiel"
+                }
+            }
+            
+            stage('Build') {
+                steps {
+                    echo "Construction de l'application avec Maven"
+                }
+            }
+            
+            stage('Test') {
+                steps {
+                    echo "Exécution des tests automatisés"
+                }
+            }
+            
+            stage('Deploy') {
+                steps {
+                    echo "Déploiement de l'application sur un serveur ou un conteneur"
+                }
+            }
+        }
+    }
+
+### **b. Définition des différentes étapes de build, de test et de déploiement dans le pipeline**
+
+Dans notre pipeline, nous avons défini plusieurs étapes pour notre processus CI/CD :
+
+- **Checkout :** Cette étape récupère le code source à partir du référentiel de code source configuré précédemment (GITHUB).
+- **Build :** Cette étape compile l'application en utilisant Maven.
+- **Test :** Cette étape exécute les tests automatisés pour vérifier la qualité du code, a l'aide de SonarQube.
+- **Deploy :** Cette étape déploie l'application sur un serveur ou un conteneur, dans cet exemple, nous avons tout d'abord deployé l'artefact créé a l'aide de Maven sur NEXUS, puis nous avons utilisé Docker pour construire l'image de l'application et la déployer dans un conteneur.
+
+Ces étapes sont les plus importantes de notre pipeline que nous verrons par la suite.
+
 &nbsp;
 
 ## **6. CONFIGURATION DES BUILDS**
+
+L'étape de configuration des builds est cruciale pour garantir que notre pipeline Jenkins peut compiler et construire notre application avec succès. Cette section met en évidence les activités réalisées et les décisions prises lors de cette étape.
+
+### **a. Configuration des outils de build dans le pipeline Jenkins**
+
+Dans cette étape, nous avons configuré l'outil de build nécessaires (Maven) dans le pipeline Jenkins. Cela garantit que Jenkins dispose de l'outil appropriés pour construire l'application selon les besoins spécifiques du projet.
+
+La configuration de Maven dans notre pipeline Jenkins est la suivante, en fonction de l'etape [2.e](#e-configuration-avancée) ou nous avons configuree Maven sous le nom **maven** :
+
+    tools {
+        maven 'maven'
+    }
+
+### **b. Spécification des paramètres de build, tels que les options de compilation, les variables d'environnement, etc**
+
+Dans notre pipeline, nous n'avons pas véritablement utilisé d'option de compilation ou encore de variables d'environnement. Nous avons utilisé les parametres par defaut pour la compilation comme suit:
+
+    stage('BUILD avec Maven') {
+        steps {
+            sh 'mvn clean package'
+        }
+    }
+
+En effectuant ces étapes, nous avons réussi à configurer avec succès l'outil de build, garantissant ainsi que notre application peut être compilée et construite correctement à chaque exécution du pipeline.
 
 &nbsp;
 
 ## **7. CONFIGURATION DES TESTS AUTOMATISES**
 
+L'étape de configuration des tests automatisés est cruciale pour garantir la qualité et la fiabilité de notre application. Dans cette section, nous mettrons en évidence les activités réalisées pour intégrer des frameworks de tests, comme SonarQube, dans le pipeline Jenkins.
+
+### **a. Intégration de SonarQube dans le pipeline Jenkins**
+
+SonarQube est un outil puissant pour l'analyse statique du code, l'inspection de la qualité du code et la détection de problèmes de sécurité. Intégrer SonarQube dans notre pipeline Jenkins nous permet d'obtenir des informations détaillées sur la qualité du code et de détecter les problèmes potentiels avant le déploiement.
+
+Son integration dans notre pipeline est le suivant, en fonction de l'etape [2.e](#e-configuration-avancée) ou nous avons configuree SonarQube sous le nom **sq1** :
+
+    stage('TEST avec Sonarqube') {
+        steps {
+            withSonarQubeEnv('sq1') { 
+                sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+            }
+        }
+    }
+
+### **b. Analyse des résultats de SonarQube**
+
+Après l'exécution de l'analyse de code avec SonarQube, les résultats seront disponibles sur le serveur SonarQube configuré a l'etape [2.e](#e-configuration-avancée). Ces résultats incluent des informations détaillées sur la qualité du code, les problèmes de code, les vulnérabilités de sécurité, les duplications de code, etc. Nous pourrons consulter les rapports générés par SonarQube pour prendre des mesures d'amélioration de la qualité du code.
+
+Resultats du test:
+![Image: "Resultats SonarQube"](./images/result_sonarqube.png)
+
+Details des bugs obtenu lors du test:
+![Image: "Bug info"](./images/bug_info.png)
+
+En effectuant ces étapes, nous avons réussi à intégrer SonarQube dans notre pipeline Jenkins pour effectuer des analyses de code automatisées et obtenir des informations détaillées sur la qualité de notre application.
+
 &nbsp;
 
 ## **8. CONFIGURATION DU DEPLOIEMENT**
+
+L'étape de configuration du déploiement est cruciale pour automatiser le processus de déploiement de notre application. Dans cette section, nous mettrons en évidence les activités réalisées pour configurer les étapes de déploiement dans le pipeline Jenkins et intégrer un outil de déploiement tel que Docker.
 
 &nbsp;
 
