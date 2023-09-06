@@ -122,7 +122,7 @@ Après l'installation, nous avons effectué la configuration initiale de Jenkins
 ![Image: "Personnaliser Jenkins"](./images/personnaliser_jenkins.bmp)
 ![Image: "Installation par defaut"](./images/default_plugin.bmp)
 ![Image: "Premier administrateur"](./images/first_admin.png)
-![Image: "Config de l'instance"](./images/config_instance.png)
+![Image: "Configuration de l'instance"](./images/config_instance.png)
 ![Image: "Jenkins est pret"](./images/jenkins_pret.png)
 
 ### **d. Tests de l'installation**
@@ -131,7 +131,7 @@ Pour confirmer que Jenkins est correctement installé, nous avons accédé à l'
 
 ![Image: "Premiere Vue"](./images/first_view.png)
 
-![Image: "Deuxieme Vue"](./images/second_view.png)
+![Image: "Vue de Test Jenkins"](./images/second_view.png)
 
 ### **e. Configuration avancée**
 
@@ -140,34 +140,34 @@ En plus de la configuration initiale, nous avons exploré les options de configu
 
 #### Configuration de Maven dans Jenkins
 
-![Image: "Config MAVEN"](./images/installation_maven.png)
+![Image: "Configuration de MAVEN"](./images/installation_maven.png)
 
 #### Configuration de SonarQube dans Jenkins
 
 Tout d’abord, nous devons installer le plugin nécessaire (SonarQube Scanner) comme suit :
-![Image: "Plugin SonarQube"](./images/plugin_sonarqube.png)
+![Image: "Installation du Plugin SonarQube"](./images/plugin_sonarqube.png)
 
 Ensuite, créer un credential, pour permettre la communication entre Jenkins et le conteneur SonarQube à l’adresse <http://51.91.204.154:9001/> :
-![Image: "Credential SonarQube"](./images/credential_sonarqube.png)
+![Image: "Configuration des acces a SonarQube"](./images/credential_sonarqube.png)
 
 Une fois le credential créé, nous devons configurer SonarQube dans Jenkins comme suit :
-![Image: "Configuration SonarQube"](./images/installation_sonarqube.png)
+![Image: "Configuration de SonarQube dans Jenkins"](./images/installation_sonarqube.png)
 
 #### Configuration de Nexus dans Jenkins
 
 Tout d’abord, nous devons installer le plugin nécessaire (Nexus Artifact Uploader) comme suit :
-![Image: "Plugin Nexus"](./images/plugin_nexus.png)
+![Image: "Installation du Plugin Nexus"](./images/plugin_nexus.png)
 
 Ensuite, créer un credential, pour permettre la communication entre Jenkins et le conteneur Nexus à l’adresse <http://51.91.204.154:8082/> :
-![Image: "Credential nexus"](./images/credential_nexus.png)
+![Image: "Configuration des acces a Nexus"](./images/credential_nexus.png)
 
 Une fois le credential créé, nous devons configurer Nexus dans Jenkins comme suit :
-![Image: "Configuration Nexus"](./images/installation_nexus.png)
+![Image: "Configuration de Nexus dans Jenkins"](./images/installation_nexus.png)
 
 #### Configuration de Docker Hub
 
 Nous avons aussi besoin de créer un credential, pour permettre à Jenkins de se connecter à notre repository Docker Hub, pour sauvegarder les images créer par les builds.
-![Image: "Credential Docker Hub"](./images/credential_docker_hub.png)
+![Image: "Configuration des access a Docker Hub"](./images/credential_docker_hub.png)
 
 **Installation de Docker :**
 
@@ -248,7 +248,7 @@ L'étape de configuration du projet Jenkins est cruciale pour définir l'environ
 ### **a. Création d'un nouveau projet Jenkins pour l'application**
 
 Nous avons créé un nouveau projet Jenkins dédié à notre application. Pour cela, nous avons utilisé l'interface Jenkins pour créer un nouveau projet de type Pipeline, selon les besoins de notre projet, et nous l'avons nommé **Projet_De_Stage_Talys**
-![Image: "Creation Projet"](./images/creation_projet.png)
+![Image: "Creation du Projet"](./images/creation_projet.png)
 
 ### **b. Configuration des paramètres généraux du projet**
 
@@ -258,13 +258,13 @@ Nous avons créé un nouveau projet Jenkins dédié à notre application. Pour c
 - **Paramètres du projet :** Ce projet contient des paramètres, mais nous les inclurons directement dans les script pipeline, pour permetre une reutilisation de ce script dans d'autres projet à l'avenir.
 
 - **Déclencheurs du projet :** Comme declencheur, nous avons specifié que notre projet se déclenchera apres chaque modification de code source sur le repository GitHub. Pour cela, nous avons configuré un webhook sur GitHub, pour informer Jenkins après chaque modification.
-![Image: "GitHub WebHook"](./images/github_webhook.png)
+![Image: "Configuration du WebHook dans GitHub"](./images/github_webhook.png)
 Et nous l'avons activé dans Jenkins comme suit:
-![Image: "Build Triggers"](./images/build_triggers.png)
+![Image: "Activation des Build Triggers"](./images/build_triggers.png)
 
 - **Definition du Projet :**
-![Image: "Definition du projet"](./images/definition_projet1.png)
-![Image: "Definition du projet"](./images/definition_projet2.png)
+![Image: "Definition du projet1"](./images/definition_projet1.png)
+![Image: "Definition du projet2"](./images/definition_projet2.png)
 
 En effectuant ces étapes, nous avons réussi à configurer avec succès le projet Jenkins pour notre application, en veillant à ce qu'il soit bien adapté à notre processus d'intégration continue et aux besoins spécifiques de notre projet.
 
@@ -374,7 +374,7 @@ Son integration dans notre pipeline est le suivant, en fonction de l'etape [2.e]
 Après l'exécution de l'analyse de code avec SonarQube, les résultats seront disponibles sur le serveur SonarQube configuré a l'etape [2.e](#e-configuration-avancée). Ces résultats incluent des informations détaillées sur la qualité du code, les problèmes de code, les vulnérabilités de sécurité, les duplications de code, etc. Nous pourrons consulter les rapports générés par SonarQube pour prendre des mesures d'amélioration de la qualité du code.
 
 Resultats du test:
-![Image: "Resultats SonarQube"](./images/result_sonarqube.png)
+![Image: "Resultats de SonarQube"](./images/result_sonarqube.png)
 
 Details des bugs obtenu lors du test:
 ![Image: "Bug info"](./images/bug_info.png)

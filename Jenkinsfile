@@ -65,6 +65,34 @@ pipeline {
             }
         }
         
+        stage ('MODIFICATION DU FICHIER ARGOCD') {
+            steps {
+                script {
+                    def exist = fileExists('Gestion_java_argocd')
+                    if (exist) { 
+                        echo 'Le repertoire de ArgoCD existe' 
+                        dir('Gestion_java_argocd'){
+                            sh 'git pull'
+                            sh "sed -i 's|leonelfeukouo/talys_app:v_.*|leonelfeukouo/talys_app:v_${env.BUILD_NUMBER}|g' ./dev/deployment.yaml"
+                            sh 'git add .'
+                            sh 'git commit -m "Modification de la version dimage"'
+                            sh 'git push https://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@github.com/LeonelFeukouo/Gestion_java_argocd.git'
+                        }
+                    } else { 
+                        echo 'Telechargement du repertoire de ArgoCD'
+                        sh 'git clone https://github.com/LeonelFeukouo/Gestion_java_argocd.git'
+                        dir('Gestion_java_argocd'){
+                            sh "sed -i 's|leonelfeukouo/talys_app:v_.*|leonelfeukouo/talys_app:v_${env.BUILD_NUMBER}|g' ./dev/deployment.yaml"
+                            sh 'git add .'
+                            sh 'git commit -m "Modification de la version dimage"'
+                            sh 'git push https://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@github.com/LeonelFeukouo/Gestion_java_argocd.git'
+                        }
+                    }
+                }
+                
+            }
+        }
+
         stage('Lancement du conteneur') {
             steps {
                 script {
