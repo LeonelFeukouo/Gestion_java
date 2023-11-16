@@ -385,12 +385,138 @@ En effectuant ces étapes, nous avons réussi à intégrer SonarQube dans notre 
 
 ## **8. CONFIGURATION DU DEPLOIEMENT**
 
-L'étape de configuration du déploiement est cruciale pour automatiser le processus de déploiement de notre application. Dans cette section, nous mettrons en évidence les activités réalisées pour configurer les étapes de déploiement dans le pipeline Jenkins et intégrer un outil de déploiement tel que Docker.
+L'étape de configuration du déploiement est cruciale pour automatiser le processus de déploiement de notre application. Dans cette section, nous mettrons en évidence les activités réalisées pour configurer les étapes de déploiement dans le pipeline Jenkins et intégrer des outils de déploiement tel que Nexus, Docker et Kubernetes.
 
-&nbsp;
+### **a. Ajout d’une machine de déploiement sur Docker dans les paramètres de Jenkins**
 
-## **9. CONFIGURATION DES NOTIFICATIONS**
+Pour permettre à Jenkins d'effectuer des opérations de déploiement sur une machine distante, nous devons configurer les paramètres de Jenkins pour qu'il puisse accéder à cette machine en toute sécurité. Cette étape implique l'ajout d'une machine de déploiement dans les paramètres de Jenkins.
 
-&nbsp;
+Voici quelques images qui montrent comment cela peut être réalisé :
+![Image: "Bug info"](./images/Ajout_noeud.png)
+![Image: "Bug info"](./images/Ajout_noeud1.png)
+![Image: "Bug info"](./images/Ajout_noeud2.png)
+![Image: "Bug info"](./images/Ajout_noeud3.png)
 
-## **10. TESTS ET VALIDATION**
+Ici, notre machine s’appelle jenkinsdocker, mais nous utiliserons son label (talys) dans notre pipeline pour faire allusion à elle.
+
+### **b. Configuration des étapes de déploiement dans le pipeline Jenkins**
+
+Dans notre pipeline Jenkins, nous avons défini les étapes de déploiement spécifiques pour notre application, et certaines utilisent SSH pour accéder aux serveurs de déploiement pour exécuter des commandes d’arrêt et de démarrage des conteneurs Docker contenant l'application. Ces étapes peuvent varier en fonction des besoins du projet, du type d'application et de l'infrastructure cible.
+
+Dans notre cas, nous avons :
+
+#### i. Spécification de la machine cible et des variables à utiliser
+
+Nous spécifions ici, la machine qui sera utilisée pour le déploiement, avec l’option **agent**, ainsi que les variables d’environnement à utiliser lors du déploiement avec l’option **environment**.
+
+Le paramètre **BUILD_NUMBER** est défini par défaut dans Jenkins, et est incrémenté à chaque exécution du pipeline, et le paramètre **DOCKERHUB_CREDENTIALS** a été défini plus haut dans ce rapport.
+
+![Image: "Machine cible et variables"](./images/variable_and_target_machine.png)
+
+#### ii. Déploiement sur Nexus
+
+Cette étape défini le script nécessaire au déploiement notre artefact compilé sur Nexus ; L’illustration de ce déploiement se fait comme suit :
+
+![Image: "Deploiement sur Nexus"](./images/deploiement_nexus.png)
+
+#### iii. Création de l’image Docker
+
+Cette étape défini le script nécessaire à la création d’une image docker (à l’aide de la commande docker build) qui sera utilisé pour lancer nos conteneurs Docker et Kubernetes.
+
+![Image: "Construction de l'image Docker"](./images/contruction_docker_image.png)
+
+Cette étape utilise le fichier Dockerfile définit comme suit :
+
+![Image: "Configuration de Dockerfile"](./images/dockerfile_configuration.png)
+
+Ce fichier se charge de copier notre artefact, vers l’emplacement adéquate, afin que Tomcat puisse le lire et le mettre à disposition de l’utilisateur finale.
+
+#### iiii. Déploiement de l’image sur DockerHub
+
+Cette étape défini le script nécessaire au déploiement de notre image sur le référentiel **Docker Hub** (à l’aide des commande Docker) ; **DOCKERHUB_CREDENTIALS_PSW** et **DOCKERHUB_CREDENTIALS_USR** ont été défini lors de la définition du paramètre **DOCKERHUB_CREDENTIALS** plus haut.
+
+![Image: "Deploiement de l'image sur DockerHub"](./images/deploiement_image_dockerhub.png)
+
+#### iiiii. Déploiement de l’application avec ArgoCD et Kubernetes
+
+Une fois l’image publiée su DockerHub, cette étape se lance pour mettre à jour l’image Docker dans le référentiel secondaire, pour que ArgoCD puisse le récupérer automatiquement, et mettre à jour notre application dans le cluster Kubernetes ;
+
+![Image: "Modification du fichier principal de ArgoCD"](./images/modification_argocd_file.png)
+
+**NB** : La section **git push** utilise le token que nous avons configuré sur GitHub.
+
+Mais avant que ArgoCD ne puisse faire les mises à jour automatiquement, nous devons créer un nouveau projet dans son interface, en spécifiant les paramètres contenus dans le fichier suivant :
+
+![Image: "Fichier de Configuration de l'application dans ArgoCD"](./images/argocd_manifest.png)
+
+C’est le fichier principal de création des applications Kubernetes avec ArgoCD. Il contient les informations nécessaires sur le repository distant, le cluster dans lequel l’application doit être déployée, ainsi que d’autres informations nécessaires à l’exécution de l’application.
+
+Pour exécuter ce fichier dans ArgoCD, il faut s’assurer que ArgoCD est déjà installée dans le cluster Kubernetes et exécuter la commande suivante :
+
+    kubectl apply -f application.yaml
+
+Lors de l’exécution de ce fichier, ArgoCD fera appel (dans notre cas) a deux autres fichiers situe dans le répertoire dev (comme mentionné dans le fichier principal précèdent) sur GitHub. Ces fichiers sont les suivants :
+
+![Image: "Manifest du Deploiement"](./images/deployment_manifest.png)
+
+Ce premier fichier est le fichier utilisé pour lancer notre application proprement dite dans le cluster Kubernetes. Il contient le nom de l’image, que nous avons précédemment déployée sur DockerHub.
+
+![Image: "Manifest du Service"](./images/sevice_manifest.png)
+
+Ce second fichier est la configuration d’un service Kubernetes qui permettra d’accéder à notre application sur le port 8080.
+
+Nous verrons les résultats du déploiement de l’application par la suite.
+
+#### iiiiii. Déploiement de l’application avec un conteneur Docker
+
+Cette étape défini le script nécessaire au lancement du conteneur docker sur la machine **jenkinsdocker** configurée plus haut ;
+
+![Image: "Lancement du Conteneur"](./images/lancement_conteneur.png)
+
+Ce script vérifie tout d’abord l’existence d’un conteneur lancé lors d’un précèdent déploiement. Si un tel conteneur existe, il le supprime avant de lancer le nouveau. Au cas contraire, il lance directement le conteneur.
+
+### **c. Vérification des résultats obtenus après l’exécution complète du pipeline**
+
+Apres l’exécution de notre pipeline, l’interface de Jenkins affiche l’image suivante, dans laquelle on peut voir que toutes les étapes ont été effectuées avec succès.
+![Image: "Image d'exécution finale"](./images/execution_finale.png)
+
+Le résultat du déploiement sur Nexus est le suivant, ou on peut constater que notre artefact a bien été uploadé.
+![Image: "Résultat du déploiement sur Nexus"](./images/nexus.png)
+
+Sur Docker Hub, on peut voir que notre image a été créé avec succès et déployée convenablement.
+![Image: "Résultat du déploiement sur DockerHub"](./images/docker_hub.png)
+
+Avant l’exécution complète de notre chaine CI/CD, notre application Kubernetes utilise l’image **leonelfeukouo/talys_app:v_4**.
+
+Son affichage dans ArgoCD se présente comme suit:
+
+![Image: "ArgoCD avant le pipeline"](./images/argocd_before.png)
+
+On remarque la présence d’un seul **replicaset**. Car, le fichier **application.yaml** n’a pas encore été modifié sur GitHub.
+
+Après l’exécution complète de notre chaine CI/CD, notre application Kubernetes utilise maintenant l’image **leonelfeukouo/talys_app:v_5**, car Jenkins s’est chargé de la modification de la version d’image sur GitHub.
+
+Son affichage dans ArgoCD se présente comme suit :
+
+![Image: "ArgoCD après le pipeline"](./images/argocd_after.png)
+
+On remarque maintenant la présence de deux replicasets, l’ancien et le nouveau. Ce qui nous confirme que ArgoCD fonctionne normalement, et notre pipeline s’est bien exécuté.
+
+Dans l’étape précédente, notre conteneur a été lancé sur le port 8080 dans le pipeline Jenkins, pour le fonctionnement de l’application sur Docker.
+
+Pour le fonctionnement avec Kubernetes, le port 8080 a aussi été configuré pour les Pod et conteneurs, mais le service qui a été créé nous demande d’accéder à l’application sur le port 30800. Nous pouvons voir cela dans la configuration du service encours d’exécution.
+
+![Image: "Port de fonctionnement sur Kubernetes"](./images/kubernetes_port.png)
+
+On peut vérifier cela dans notre navigateur, pour voir si tout s’est exactement bien passé.
+
+Les adresses IP suivantes nous donnent exactement les mêmes résultats.
+
+- Fonctionnement sur Docker : <http://51.91.204.154:8080/>
+- Fonctionnement sur Kubernetes : <http://51.91.204.153:30800/>
+
+![Image: "Exécution de l'application web"](./images/app_execution.png)
+
+On peut constater que tout s’est passé comme prévu. Notre application fonctionne parfaitement.
+
+En effectuant ces étapes, nous avons réussi à configurer avec succès les étapes de déploiement dans le pipeline Jenkins et à intégrer des outils de déploiement tels que Docker pour réaliser le déploiement automatisé de notre application.
